@@ -7,6 +7,8 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Crypt;
 
 class User extends Authenticatable
 {
@@ -17,10 +19,15 @@ class User extends Authenticatable
      *
      * @var array<int, string>
      */
+
+    protected $guarded = ['id'];
+
     protected $fillable = [
         'name',
-        'email',
+        'nip',
         'password',
+        'role',
+
     ];
 
     /**
@@ -29,7 +36,7 @@ class User extends Authenticatable
      * @var array<int, string>
      */
     protected $hidden = [
-        'password',
+
         'remember_token',
     ];
 
@@ -39,7 +46,16 @@ class User extends Authenticatable
      * @var array<string, string>
      */
     protected $casts = [
-        'email_verified_at' => 'datetime',
+        'nip_verified_at' => 'datetime',
         'password' => 'hashed',
     ];
+    public function posts()
+    {
+        return $this->hasMany(Post::class);
+    }
+
+    public function getPlainTextPasswordAttribute()
+    {
+        return decrypt($this->attributes['password']);
+    }
 }
